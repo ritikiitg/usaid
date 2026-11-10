@@ -1,0 +1,30 @@
+# Optional: run a local Postgres for development without touching Supabase.
+#
+#   docker compose up -d
+#   # then set server/.env:
+#   DATABASE_URL="postgresql://usaid:usaid@localhost:5432/usaid"
+#   DIRECT_URL="postgresql://usaid:usaid@localhost:5432/usaid"
+#
+# Stop with `docker compose down`. Data persists in the named volume.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: usaid-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: usaid
+      POSTGRES_PASSWORD: usaid
+      POSTGRES_DB: usaid
+    ports:
+      - "5432:5432"
+    volumes:
+      - usaid-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "usaid"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  usaid-pg-data:
